@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="dark_theme">
+        <attr name="app_background_color" format="color"/>
+        <attr name="card_background_color" format="color"/>
+        <attr name="white_text_color" format="color"/>
+        <attr name="charging_color" format="color"/>
+        <attr name="current_color" format="color"/>
+        <attr name="voltage_color" format="color"/>
+        <attr name="charging_icon_tint_color" format="color"/>
+    </declare-styleable>
+
+</resources>
