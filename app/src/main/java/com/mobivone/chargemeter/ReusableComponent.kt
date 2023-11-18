@@ -15,8 +15,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
@@ -29,9 +27,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,13 +46,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.mobivone.chargemeter.uiScreen.AboutUs
-import com.mobivone.chargemeter.uiScreen.Detail
-import com.mobivone.chargemeter.uiScreen.Measure
+import com.mobivone.chargemeter.navigationGraph.NavGraph
 
 @OptIn(ExperimentalMaterial3Api::class)
 /*
@@ -134,9 +130,9 @@ fun navigationDrawerItem(
     navController: NavHostController,
     destination: String
 ) {
- val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoot = navBackStackEntry?.destination?.route
-    val selected = currentRoot==destination
+    val selected = currentRoot == destination
     Row(
         Modifier
             .fillMaxWidth()
@@ -146,10 +142,13 @@ fun navigationDrawerItem(
         Icon(
             painter = icon,
             contentDescription = "",
-            tint = if(selected) colorResource(id = R.color.sky_color) else Color.White
+            tint = if (selected) colorResource(id = R.color.sky_color) else Color.White
         )
         Spacer(modifier = Modifier.width(10.dp))
-        Text(text = "$title", color = if (selected) colorResource(id = R.color.sky_color) else Color.White)
+        Text(
+            text = "$title",
+            color = if (selected) colorResource(id = R.color.sky_color) else Color.White
+        )
     }
 }
 
@@ -165,26 +164,36 @@ fun BodyContent(navController: NavHostController) {
     //to track which screen are now visible Right now
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
+
+    LaunchedEffect(currentRoute) {
+        navigateClick = false // Reset the navigateClick state when a new route is navigated to
+    }
+
     if (currentRoute == "measure") {
         appbarTitle = "Measure"
+
     } else if (currentRoute == "detail") {
         appbarTitle = "Detail"
+
     } else if (currentRoute == "about_us") {
         appbarTitle = "About Us"
+
     }
+
+    val coroutineScope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .scale(scaleAnim)
             .offset(x = offSetAnim)
-            /* .clip(if (navigateClick) RoundedCornerShape(0.dp) else RoundedCornerShape(0.dp))*/
-            .verticalScroll(rememberScrollState())
+        /* .clip(if (navigateClick) RoundedCornerShape(0.dp) else RoundedCornerShape(0.dp))*/
+        //  .verticalScroll(rememberScrollState())
     ) {
         Scaffold(
             modifier = Modifier
                 .fillMaxWidth()
-                .border(0.dp, color = colorResource(id = R.color.app_background)),
+                .border(0.dp, color = colorResource(id = R.color.light_black)),
 
             containerColor = colorResource(id = R.color.app_background),
             topBar = {
@@ -201,7 +210,8 @@ fun BodyContent(navController: NavHostController) {
                         )
                     },
                     navigationIcon = {
-                        val icon = if (navigateClick) Icons.AutoMirrored.Filled.ArrowBack else Icons.Default.Menu
+                        val icon =
+                            if (navigateClick) Icons.AutoMirrored.Filled.ArrowBack else Icons.Default.Menu
                         IconButton(
                             onClick = { navigateClick = !navigateClick },
                             colors = IconButtonDefaults.iconButtonColors(
@@ -221,21 +231,7 @@ fun BodyContent(navController: NavHostController) {
             },
             content = { paddingvalue ->
                 Column(Modifier.padding(paddingvalue)) {
-                    NavHost(navController = navController, startDestination = "measure") {
-                        composable("measure") {
-                            Measure()
-
-                        }
-                        composable("detail") {
-                            Detail()
-                        }
-                        composable("about_us") {
-
-                            AboutUs()
-                        }
-
-
-                    }
+                    NavGraph(navController = navController)
 
                 }
 
