@@ -18,9 +18,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
@@ -30,11 +34,28 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mobivone.chargemeter.BatteryViewModel
 import com.mobivone.chargemeter.R
+import java.text.DecimalFormat
+import java.text.NumberFormat
+
 
 /** FOR VERTICLE DIVIDER WE NEED MUST SPECIFC HEIGHT FOR CONTAINER (roW,COLOUMN,CARD,BOX,ETC) ***/
 @Composable
 fun Measure() {
+    var MeasureFormat: NumberFormat = DecimalFormat("0.00")
+    val context = LocalContext.current
+
+
+    val BatteryViewModel = BatteryViewModel.getInstance(context)
+    val batteryData by BatteryViewModel.batteryDataFlow.collectAsState()
+
+
+    val betteryIcon = getPercentageIcon(percentageIconValue = batteryData.percentage)
+
+    val powerwatt = MeasureFormat.format(batteryData.spotCurrent.toFloat() * batteryData.batteryVoltage)
+
+    //  Toast.makeText(context, "$percentage", Toast.LENGTH_SHORT).show()
     Column(
         Modifier
             .fillMaxSize()
@@ -51,16 +72,19 @@ fun Measure() {
                 contentDescription = "",
                 tint = colorResource(
                     id = R.color.sky_color
-                ))
+                )
+            )
             Spacer(modifier = Modifier.width(9.dp))
             Text(
                 text = "NORMAL ",
                 fontSize = 16.sp,
-                color = colorResource(id = R.color.sky_color))
+                color = colorResource(id = R.color.sky_color)
+            )
             Text(
-                text = "AC PLUG ",
+                text = "${batteryData.plugged} ",
                 fontSize = 16.sp,
-                color = colorResource(id = R.color.sky_color))
+                color = colorResource(id = R.color.sky_color)
+            )
         }
         Row(
             Modifier
@@ -84,10 +108,11 @@ fun Measure() {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "97",
+                        text = "${batteryData.percentage}",
                         fontSize = 60.sp,
                         fontFamily = FontFamily(Font(R.font.digital7_1e1z)),
-                        color = colorResource(id = R.color.white_text_color))
+                        color = colorResource(id = R.color.white_text_color)
+                    )
                     Box(
                         Modifier.height(45.dp),
                         contentAlignment = Alignment.BottomStart
@@ -98,12 +123,12 @@ fun Measure() {
                             color = Color.White
                         )
                     }
+
+
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_empty_battery),
+                        painter = betteryIcon,
                         contentDescription = "",
-                        tint = colorResource(
-                            id = R.color.white
-                        ), modifier = Modifier
+                        modifier = Modifier
                             .height(70.dp)
                             .width(160.dp)
                     )
@@ -112,11 +137,11 @@ fun Measure() {
                 Row(
                     Modifier
                         .fillMaxWidth()
-                        .height(50.dp)
+                        .height(51.dp)
                         .padding(0.dp),
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically,
-                    ) {
+                ) {
                     Column(
                         Modifier
                             .fillMaxWidth()
@@ -130,16 +155,16 @@ fun Measure() {
                             tint = colorResource(id = R.color.light_white)
                         )
                         Spacer(modifier = Modifier.height(4.dp))
-                       /* Text(
-                            text = "0.00",
-                            fontFamily = FontFamily(Font(R.font.digital7mono_b1g5)),
-                            color = colorResource(id = R.color.sky_color),
-                            fontSize = 28.sp,)*/
+                        /* Text(
+                         text = "0.00",
+                         fontFamily = FontFamily(Font(R.font.digital7mono_b1g5)),
+                         color = colorResource(id = R.color.sky_color),
+                         fontSize = 28.sp,)*/
                         DegitalValueBox(
-                            largetext = "0.00",
+                            largetext = "${batteryData.batteryVoltage} V",
                             largecolor = colorResource(id = R.color.sky_color),
                             smallcolor = colorResource(id = R.color.white_text_color),
-                            smallvalue ="",
+                            smallvalue = "",
                             fontsize = 28.sp,
                             topPadding = 5.dp,
                             endPadding = 10.dp,
@@ -164,10 +189,10 @@ fun Measure() {
                         )
                         Spacer(modifier = Modifier.height(2.dp))
                         DegitalValueBox(
-                            largetext = "0.00",
+                            largetext = "${batteryData.batteryTemprature}",
                             largecolor = colorResource(id = R.color.sky_color),
                             smallcolor = colorResource(id = R.color.white_text_color),
-                            smallvalue ="",
+                            smallvalue = "",
                             fontsize = 28.sp,
                             topPadding = 5.dp,
                             endPadding = 10.dp,
@@ -198,16 +223,16 @@ fun Measure() {
                             horizontalArrangement = Arrangement.Center,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                        DegitalValueBox(
-                            largetext = "0.00",
-                            largecolor = colorResource(id = R.color.current_color),
-                            smallcolor = colorResource(id = R.color.white_text_color),
-                            smallvalue ="mAh",
-                            fontsize = 28.sp,
-                            topPadding = 5.dp,
-                            endPadding = 10.dp,
-                            fontWeight = FontWeight.Light
-                        )
+                            DegitalValueBox(
+                                largetext = "${batteryData.batteryCapacity}",
+                                largecolor = colorResource(id = R.color.current_color),
+                                smallcolor = colorResource(id = R.color.white_text_color),
+                                smallvalue = "mAh",
+                                fontsize = 28.sp,
+                                topPadding = 5.dp,
+                                endPadding = 10.dp,
+                                fontWeight = FontWeight.Light
+                            )
                         }
                     }
                 }
@@ -237,19 +262,19 @@ fun Measure() {
                     Text(
                         text = "CURRENT",
                         fontSize = 13.sp,
-                        color = colorResource(id = R.color.white_text_color))
+                        color = colorResource(id = R.color.white_text_color)
+                    )
 
-                        DegitalValueBox(
-                            largetext = "0.00",
-                            largecolor = colorResource(id = R.color.current_color),
-                            smallcolor = colorResource(id = R.color.white_text_color),
-                            smallvalue ="A",
-                            fontsize = 40.sp,
-                            topPadding = 14.dp,
-                            endPadding = 45.dp,
-                            fontWeight= FontWeight.W600
-                        )
-
+                    DegitalValueBox(
+                        largetext = "${batteryData.spotCurrent}",
+                        largecolor = colorResource(id = R.color.current_color),
+                        smallcolor = colorResource(id = R.color.white_text_color),
+                        smallvalue = "A",
+                        fontsize = 40.sp,
+                        topPadding = 14.dp,
+                        endPadding = 45.dp,
+                        fontWeight = FontWeight.W600
+                    )
 
 
                 }
@@ -271,20 +296,23 @@ fun Measure() {
                         color = colorResource(id = R.color.white_text_color)
                     )
                     DegitalValueBox(
-                        largetext = "0.00",
+                        largetext = "${powerwatt}",
                         largecolor = colorResource(id = R.color.sky_color),
                         smallcolor = colorResource(id = R.color.white_text_color),
-                        smallvalue ="W",
+                        smallvalue = "W",
                         fontsize = 40.sp,
                         topPadding = 14.dp,
                         endPadding = 44.dp,
-                        fontWeight= FontWeight.W600
+                        fontWeight = FontWeight.W600
                     )
                 }
 
 
             }
-            HorizontalDivider(thickness = 1.dp, modifier = Modifier.padding(start = 8.dp, end = 8.dp))
+            HorizontalDivider(
+                thickness = 1.dp,
+                modifier = Modifier.padding(start = 8.dp, end = 8.dp)
+            )
             Row(
                 Modifier
                     .fillMaxWidth()
@@ -305,11 +333,11 @@ fun Measure() {
                         largetext = "0.00",
                         largecolor = colorResource(id = R.color.current_color),
                         smallcolor = colorResource(id = R.color.white_text_color),
-                        smallvalue ="Ah",
+                        smallvalue = "Ah",
                         fontsize = 30.sp,
                         topPadding = 10.dp,
                         endPadding = 47.dp,
-                        fontWeight= FontWeight.W600
+                        fontWeight = FontWeight.W600
                     )
                 }
                 VerticalDivider(
@@ -327,17 +355,17 @@ fun Measure() {
                         largetext = "0.00",
                         largecolor = colorResource(id = R.color.sky_color),
                         smallcolor = colorResource(id = R.color.white_text_color),
-                        smallvalue ="Wh",
+                        smallvalue = "Wh",
                         fontsize = 30.sp,
                         topPadding = 10.dp,
                         endPadding = 45.dp,
-                        fontWeight= FontWeight.W600
+                        fontWeight = FontWeight.W600
                     )
                 }
 
             }
         }
-/*** LAST ROW ***/
+        /*** LAST ROW ***/
         Spacer(modifier = Modifier.height(10.dp))
         Row(
             Modifier
@@ -362,11 +390,11 @@ fun Measure() {
                     largetext = "0.00",
                     largecolor = colorResource(id = R.color.sky_color),
                     smallcolor = colorResource(id = R.color.white_text_color),
-                    smallvalue ="A",
+                    smallvalue = "A",
                     fontsize = 20.sp,
                     topPadding = 2.dp,
                     endPadding = 32.dp,
-                    fontWeight= FontWeight.W600
+                    fontWeight = FontWeight.W600
                 )
 
             }
@@ -387,11 +415,11 @@ fun Measure() {
                     largetext = "0.00",
                     largecolor = colorResource(id = R.color.sky_color),
                     smallcolor = colorResource(id = R.color.white_text_color),
-                    smallvalue ="A",
+                    smallvalue = "A",
                     fontsize = 20.sp,
                     topPadding = 2.dp,
                     endPadding = 32.dp,
-                    fontWeight= FontWeight.W600
+                    fontWeight = FontWeight.W600
                 )
 
             }
@@ -403,42 +431,51 @@ fun Measure() {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(2.dp)
             ) {
-                Text(text = "AVG", color = colorResource(id = R.color.white_text_color), fontSize = 13.sp)
+                Text(
+                    text = "AVG",
+                    color = colorResource(id = R.color.white_text_color),
+                    fontSize = 13.sp
+                )
                 DegitalValueBox(
                     largetext = "0.00",
                     largecolor = colorResource(id = R.color.sky_color),
                     smallcolor = colorResource(id = R.color.white_text_color),
-                    smallvalue ="A",
+                    smallvalue = "A",
                     fontsize = 20.sp,
                     topPadding = 2.dp,
                     endPadding = 32.dp,
-                    fontWeight= FontWeight.W600
+                    fontWeight = FontWeight.W600
                 )
 
 
             }
         }
-        HorizontalDivider(thickness = 1.dp, modifier = Modifier.padding(start=8.dp,end=8.dp))
+        HorizontalDivider(
+            thickness = 1.dp,
+            modifier = Modifier.padding(start = 8.dp, end = 8.dp)
+        )
         /**3rd row complet **/
         Row(
             Modifier
                 .fillMaxWidth()
                 .height(35.dp)
-                .background(color = colorResource(id = R.color.light_black))) {
+                .background(color = colorResource(id = R.color.light_black))
+        ) {
             Column(
                 Modifier
                     .fillMaxWidth()
                     .weight(1f)
-                    .padding(3.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                    .padding(3.dp), horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 DegitalValueBox(
                     largetext = "0.00",
                     largecolor = colorResource(id = R.color.sky_color),
                     smallcolor = colorResource(id = R.color.white_text_color),
-                    smallvalue ="W",
+                    smallvalue = "W",
                     fontsize = 20.sp,
                     topPadding = 2.dp,
                     endPadding = 26.dp,
-                    fontWeight= FontWeight.W600
+                    fontWeight = FontWeight.W600
                 )
 
             }
@@ -447,16 +484,17 @@ fun Measure() {
                 Modifier
                     .fillMaxWidth()
                     .weight(1f)
-                    .padding(3.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                    .padding(3.dp), horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 DegitalValueBox(
                     largetext = "0.00",
                     largecolor = colorResource(id = R.color.sky_color),
                     smallcolor = colorResource(id = R.color.white_text_color),
-                    smallvalue ="W",
+                    smallvalue = "W",
                     fontsize = 20.sp,
                     topPadding = 2.dp,
                     endPadding = 26.dp,
-                    fontWeight= FontWeight.W600
+                    fontWeight = FontWeight.W600
                 )
             }
             VerticalDivider(thickness = 1.dp, modifier = Modifier.padding(bottom = 8.dp))
@@ -464,16 +502,17 @@ fun Measure() {
                 Modifier
                     .fillMaxWidth()
                     .weight(1f)
-                    .padding(3.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                    .padding(3.dp), horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 DegitalValueBox(
                     largetext = "0.00",
                     largecolor = colorResource(id = R.color.sky_color),
                     smallcolor = colorResource(id = R.color.white_text_color),
-                    smallvalue ="W",
+                    smallvalue = "W",
                     fontsize = 20.sp,
                     topPadding = 2.dp,
                     endPadding = 26.dp,
-                    fontWeight= FontWeight.W600
+                    fontWeight = FontWeight.W600
                 )
 
             }
@@ -486,7 +525,16 @@ fun Measure() {
 }
 
 @Composable
-fun DegitalValueBox(largetext:String, largecolor:Color,smallcolor:Color,smallvalue:String,fontsize:TextUnit,topPadding:Dp,endPadding:Dp,fontWeight: FontWeight) {
+fun DegitalValueBox(
+    largetext: String,
+    largecolor: Color,
+    smallcolor: Color,
+    smallvalue: String,
+    fontsize: TextUnit,
+    topPadding: Dp,
+    endPadding: Dp,
+    fontWeight: FontWeight
+) {
     Box(
         modifier = Modifier.fillMaxWidth(),
         contentAlignment = Alignment.Center
@@ -504,9 +552,29 @@ fun DegitalValueBox(largetext:String, largecolor:Color,smallcolor:Color,smallval
             fontSize = 13.sp,
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(top = topPadding, end = endPadding,)
+                .padding(top = topPadding, end = endPadding)
         )
     }
 
-
 }
+
+
+@Composable
+fun getPercentageIcon(percentageIconValue: Int): Painter {
+    val batteryIcon = when {
+        percentageIconValue <= 5 -> painterResource(id = R.drawable.ic_empty_battery)
+        percentageIconValue > 5 && percentageIconValue <= 20 -> painterResource(id = R.drawable.ic_twentyfive_battery)
+        percentageIconValue > 20 && percentageIconValue <= 50 -> painterResource(id = R.drawable.ic_fifty_battery)
+        percentageIconValue > 50 && percentageIconValue <= 75 -> painterResource(id = R.drawable.ic_seventyfive_battery)
+        else -> painterResource(id = R.drawable.ic_full_battery)
+    }
+    return batteryIcon
+    //  return  rememberVectorPainter(image = batteryIcon)
+}
+
+
+
+
+
+
+

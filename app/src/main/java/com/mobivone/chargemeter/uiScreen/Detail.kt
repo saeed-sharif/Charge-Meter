@@ -1,6 +1,7 @@
 package com.mobivone.chargemeter.uiScreen
 
 
+import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,10 +17,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
@@ -28,14 +32,22 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mobivone.chargemeter.BatteryViewModel
 import com.mobivone.chargemeter.R
 
 @Composable
 fun Detail() {
+    val model= Build.MODEL
+    val context= LocalContext.current
+    val BatteryViewModel= BatteryViewModel.getInstance(context)
+    val batteryData by BatteryViewModel.batteryDataFlow.collectAsState()
+
     Column(
         Modifier
-            .fillMaxSize().padding(5.dp)
-            .background(color = colorResource(id = R.color.app_background)).clip(shape= RoundedCornerShape(5.dp)),
+            .fillMaxSize()
+            .padding(5.dp)
+            .background(color = colorResource(id = R.color.app_background))
+            .clip(shape = RoundedCornerShape(5.dp)),
 
 
     ) {
@@ -46,7 +58,7 @@ fun Detail() {
                 .padding(top = 10.dp, start = 24.dp)
         ) {
             Text(
-                text = "Phone Model:",
+                text = model,
                 color = colorResource(id = R.color.white_text_color),
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold
@@ -56,12 +68,16 @@ fun Detail() {
             Modifier
                 .fillMaxWidth()
                 .height(95.dp)
-                .background(color = colorResource(id = R.color.light_black),shape = RoundedCornerShape(5.dp))
+                .background(
+                    color = colorResource(id = R.color.light_black),
+                    shape = RoundedCornerShape(5.dp)
+                )
                 .padding(top = 20.dp, start = 24.dp)
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxWidth().weight(1f),
+                    .fillMaxWidth()
+                    .weight(1f),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(3.dp)
             ) {
@@ -73,7 +89,7 @@ fun Detail() {
                     )
                 )
                 Text(
-                    text = " HEALTH",
+                    text =" ${batteryData.health}",
                     fontSize = 28.sp,
                     fontWeight = FontWeight.W600,
                     fontFamily = FontFamily(
@@ -98,7 +114,7 @@ fun Detail() {
                     )
                 )
                 Text(
-                    text = " LI ION",
+                    text = "${batteryData.batteryTechnology}",
                     fontSize = 28.sp,
                     fontWeight = FontWeight.W600,
                     fontFamily = FontFamily(
@@ -115,52 +131,60 @@ fun Detail() {
 
         ) {
 
-            Column(Modifier.fillMaxWidth().padding(10.dp), verticalArrangement =Arrangement.spacedBy(10.dp)) {
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp), verticalArrangement =Arrangement.spacedBy(10.dp)) {
                 Spacer(modifier = Modifier.height(4.dp))
                 minorDetailBatter(
                     painterResource(id = R.drawable.ic_battery_level),
                     "Battery Level",
-                    "35 %"
+                    "${batteryData.percentage} %"
                 )
                 minorDetailBatter(
                     painterResource(id = R.drawable.ic_plugged),
                     "Plugged",
-                    "li ion"
+                    "${batteryData.plugged}"
                 )
                 minorDetailBatter(
                     painterResource(id = R.drawable.ic_status),
                     "Status",
-                    "li ion"
+                  "${batteryData.status}"
+                )
+                minorDetailBatter(
+                    painterResource(id = R.drawable.ic_voltage),
+                    "Voltage",
+                  "${batteryData.batteryVoltage} V"
                 )
                 minorDetailBatter(
                     painterResource(id = R.drawable.ic_fast_charging),
                     "Fast Charging",
-                    ""
+                    "${batteryData.chargingSpeed}"
                 )
                 minorDetailBatter(
                     painterResource(id = R.drawable.ic_temperature),
                     "Temprature",
-                    "li ion"
+                    "${batteryData.batteryTemprature}"
                 )
                 minorDetailBatter(
                     painterResource(id = R.drawable.ic_capacity),
                     "Battery Capacity",
-                    ""
+                   "${batteryData.batteryCapacity}"
                 )
                 minorDetailBatter(
                     painterResource(id = R.drawable.ic_energy),
                     "Battery Energy",
-                    ""
+                    "${batteryData.batteryEnergy } mWh"
                 )
                 minorDetailBatter(
                     painterResource(id = R.drawable.ic_current_charging),
                     "Average Current",
-                    ""
+                    "${batteryData.batteryAvrageCurrent} mA"
                 )
                 minorDetailBatter(
                     painterResource(id = R.drawable.ic_charging_current),
                     "Average Power",
-                    ""
+                    "${batteryData.avragePower} mW"
                 )
 
 
