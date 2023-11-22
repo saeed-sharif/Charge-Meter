@@ -1,111 +1,127 @@
 package com.mobivone.chargemeter
 
+import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.BatteryManager
+import android.os.Handler
+import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import com.mobivone.chargemeter.utils.BatteryManagerBroadcastReceiver
-import com.mobivone.chargemeter.utils.batteryData
 import com.mobivone.chargemeter.utils.batteryUtils
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.text.DecimalFormat
 import java.text.NumberFormat
 
 class BatteryViewModel(private val context: Context) : ViewModel() {
-
     var format: NumberFormat = DecimalFormat("#.#")
-    var MeasureFormat:NumberFormat=DecimalFormat("0.00")
-
-
+    var MeasureFormat: NumberFormat = DecimalFormat("0.00")
     val batteryManager: BatteryManager by lazy {
         context.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
     }
+    val health = MutableStateFlow("")
+    val batteryTechnology = MutableStateFlow("")
+    val percentageCharge = MutableStateFlow(0)
+    val plugged = MutableStateFlow("")
+    val status = MutableStateFlow("")
+    val batteryVoltage = MutableStateFlow(0.0f)
+    val chargingSpeed = MutableStateFlow("")
+    val BatteryTemprature = MutableStateFlow("")
+    val batteryCapacity = MutableStateFlow(0)
+    val batteryEnergy = MutableStateFlow(0)
+    val batteryAvrageCurrent = MutableStateFlow(0)
+    val averagePower = MutableStateFlow("")
+    val MeasureAvrageCurrent = MutableStateFlow("0.0")
+    val MeasureaverageWatt = MutableStateFlow("0.0")
 
-    var batteryDataFlow: MutableStateFlow<batteryData> = MutableStateFlow(
-        batteryData(
-            0,
-            "",
-            "",
-            "",
-            status = "",
-            batteryVoltage = 4.0f,
-            batteryTemprature = "0",
-            batteryAvrageCurrent = 1,
-            batteryCapacity = 4000,
-            batteryEnergy = 432,
-            "slow",
-            "",
-            avragePower =4.4f,
-            batteryMeasureAverageCurrent =0.91f,
-            spotCurrent ="43.3f",
-            averageWatt =3.8,
+    /*** This for Measure Activity  ***/
+    val spotCurrent = MutableStateFlow("")
+    val WattPower = MutableStateFlow("")
 
-            )
-    )
+    /******** MIN MAX, CURRENT & WATT ***********/
+    var maximumCurrent = MutableStateFlow("")
+    var minimumCurrent = MutableStateFlow("")
+    var maximumWatt = MutableStateFlow("")
+    var minimumWatt = MutableStateFlow("")
 
+    @SuppressLint("RememberReturnType")
     val broadcastReceiver: BroadcastReceiver = BatteryManagerBroadcastReceiver {
-        val health =
+        //Detail  View related data
+        health.value =
             batteryUtils.getBatteryHealthText(it.getIntExtra(BatteryManager.EXTRA_HEALTH, -99))
-        var percentageCharge: Int = it.getIntExtra(BatteryManager.EXTRA_LEVEL, 0)
-
-        val level = it.getIntExtra(BatteryManager.EXTRA_LEVEL, -99)
-        val scale = it.getIntExtra(BatteryManager.EXTRA_SCALE, -99)
-        val status =
-            batteryUtils.getBatteryStatusText(it.getIntExtra(BatteryManager.EXTRA_STATUS, -99))
-        val plugged =
+        batteryTechnology.value = it.getStringExtra(BatteryManager.EXTRA_TECHNOLOGY).toString()
+        percentageCharge.value = it.getIntExtra(BatteryManager.EXTRA_LEVEL, 0)
+        plugged.value =
             batteryUtils.getBatteryPluggedText(it.getIntExtra(BatteryManager.EXTRA_PLUGGED, -99))
-        val batteryTechnology = it.getStringExtra(BatteryManager.EXTRA_TECHNOLOGY)
-        val batteryVoltage =
-            it.getIntExtra(BatteryManager.EXTRA_VOLTAGE, -99)
-        val formatedBatteryVoltage = format.format(batteryVoltage * 0.001).toFloat()
-        val Temprature = it.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, -99) / 10
-        val batteryTemprature = Temprature.toString() + " " + 0x00B0.toChar() + "C"
-
-        val batteryAvrageCurrent =
-            batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CURRENT_AVERAGE) / (1000)
-        val batteryMeasureAverageCurrent=batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CURRENT_AVERAGE)/1_000_000
-
-        val avgWatt = batteryAvrageCurrent * formatedBatteryVoltage.toFloat()
-        val formatedAvrageWatt =format.format(avgWatt)
-        //charging speed
+        status.value =
+            batteryUtils.getBatteryStatusText(it.getIntExtra(BatteryManager.EXTRA_STATUS, -99))
+        //Full Voltage
+        batteryVoltage.value = batteryUtils.getVoltage(it)
+        /*** For finding Charging Speed **/
         val spotCurrentForBatteryCharge =
             Math.abs(batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CURRENT_NOW) / (1000))
         val batterycharge = spotCurrentForBatteryCharge / 1000.0
-
-        val watt = batterycharge * formatedBatteryVoltage.toFloat()
-        val chargingSpeed = batteryUtils.getChargingSpeed(watt)
-        val batteryCapacity = batteryUtils.getBatteryCapacity(context).toInt()
-        val batteryEnergy = batteryVoltage.toInt() * batteryCapacity.toInt()
-        val averagePower=batteryAvrageCurrent * formatedBatteryVoltage.toFloat()
-        val spotCurrentt = MeasureFormat.format(Math.abs(batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CURRENT_NOW) / (1000.0 * 1000.0)))
-        val averageCurrentformeasure=batteryUtils.getAvgCurrent(batteryManager)
-
-        val averageWatt= averageCurrentformeasure * formatedBatteryVoltage
-
-        val newDataList = batteryData(
-            percentageCharge,
-            health,
-            batteryTechnology,
-            plugged,
-            status,
-            formatedBatteryVoltage,
-            batteryTemprature,
-            batteryAvrageCurrent = batteryAvrageCurrent,
-            batteryCapacity,
-            batteryEnergy,
-            chargingSpeed,
-            formatedAvrageWatt,
-            averagePower,
-            batteryMeasureAverageCurrent.toFloat(),
-            spotCurrentt,
-            averageWatt
-
-        )
-        batteryDataFlow.value = newDataList
+        val watt = batterycharge * batteryVoltage.value
+        chargingSpeed.value = batteryUtils.getChargingSpeed(watt)
+        /*** Speed End **/
+        val Temprature = it.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, -99) / 10
+        BatteryTemprature.value = Temprature.toString() + " " + 0x00B0.toChar() + "C"
+        batteryCapacity.value = batteryUtils.getBatteryCapacity(context).toInt()
+        batteryEnergy.value =
+            batteryUtils.AveragePower(batteryManager, batteryVoltage.value, batteryCapacity.value)
+        /*** AVERAGE CURRENT NOT GOT IT WHEN CHANG WE NEED TO REQUEST MULTIPLE TIME ***/
+        val handler: Handler = Handler()
+        val AverageCurrentChecker = object : Runnable {
+            var maximum = 0.0
+            var minimum = 0.0
+            override fun run() {
+                try {
+                    batteryAvrageCurrent.value = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CURRENT_AVERAGE) / 1000
+                    val averageWatt = batteryAvrageCurrent.value * batteryVoltage.value.toDouble()
+                    averagePower.value = format.format(averageWatt)
+                    /****    SPOT CURRENT AND  WATT POWER *****/
+                    val spotCurrentt = batteryUtils.spotCurrent(batteryManager)
+                    spotCurrent.value = ""
+                    spotCurrent.value = MeasureFormat.format(spotCurrentt)
+                    val wattpower = spotCurrent.value.toDouble() * batteryVoltage.value.toFloat()
+                    WattPower.value = ""
+                    WattPower.value = MeasureFormat.format(wattpower)
+                    /******************   Measure Average Current and Power *****************************/
+                    MeasureAvrageCurrent.value =
+                        MeasureFormat.format(batteryUtils.getAvgCurrent(batteryManager))
+                    MeasureaverageWatt.value = MeasureFormat.format(MeasureAvrageCurrent.value.toDouble() * batteryVoltage.value)
+                    /*** FOR MIN MAX  ***/
+                    if (maximum == 0.0 || spotCurrentt > maximum) {
+                        maximum = spotCurrentt
+                        maximumCurrent.value = ""
+                        maximumCurrent.value = MeasureFormat.format(spotCurrentt)
+                        val maxWatt = spotCurrentt * batteryVoltage.value
+                        maximumWatt.value = ""
+                        maximumWatt.value = MeasureFormat.format(maxWatt)
+                    }
+                    if (minimum == 0.0 || spotCurrentt < minimum) {
+                        minimum = spotCurrentt
+                        minimumCurrent.value = ""
+                        minimumCurrent.value = MeasureFormat.format(spotCurrentt)
+                        val minWatt = spotCurrentt * batteryVoltage.value
+                        minimumWatt.value = ""
+                        minimumWatt.value = MeasureFormat.format(minWatt)
+                    }
+                    Log.d("changable", "$batteryAvrageCurrent  ----------  $averagePower")
+                } catch (e: Exception) {
+                    Toast.makeText(context, "${e.message}", Toast.LENGTH_SHORT).show()
+                } finally {
+                    handler.postDelayed(this, 3000)
+                }
+            }
+        }
+        handler.post(AverageCurrentChecker)
     }
 
+    /*****   LAST ROW VALUE UPDATATION MIN MAX, AVERAGE *****/
     companion object {
         @Volatile
         private lateinit var instance: BatteryViewModel

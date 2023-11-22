@@ -67,9 +67,6 @@ fun BodyContent(navController: NavHostController) {
         appbarTitle = "About Us"
 
     }
-
-
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -119,7 +116,10 @@ fun BodyContent(navController: NavHostController) {
             },
             content = { paddingvalue ->
                 Column(Modifier.padding(paddingvalue)) {
-                   NavGraph(navController = navController)
+
+                        NavGraph(navController = navController)
+
+
 
                 }
 

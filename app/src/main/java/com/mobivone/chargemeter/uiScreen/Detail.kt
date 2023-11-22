@@ -18,7 +18,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,8 +38,8 @@ import com.mobivone.chargemeter.R
 fun Detail() {
     val model= Build.MODEL
     val context= LocalContext.current
-    val BatteryViewModel= BatteryViewModel.getInstance(context)
-    val batteryData by BatteryViewModel.batteryDataFlow.collectAsState()
+    val Bviewmodel= BatteryViewModel.getInstance(context)
+
 
     Column(
         Modifier
@@ -89,7 +88,7 @@ fun Detail() {
                     )
                 )
                 Text(
-                    text =" ${batteryData.health}",
+                    text =" ${Bviewmodel.health.collectAsState().value}",
                     fontSize = 28.sp,
                     fontWeight = FontWeight.W600,
                     fontFamily = FontFamily(
@@ -114,7 +113,7 @@ fun Detail() {
                     )
                 )
                 Text(
-                    text = "${batteryData.batteryTechnology}",
+                    text = Bviewmodel.batteryTechnology.collectAsState().value,
                     fontSize = 28.sp,
                     fontWeight = FontWeight.W600,
                     fontFamily = FontFamily(
@@ -139,52 +138,52 @@ fun Detail() {
                 minorDetailBatter(
                     painterResource(id = R.drawable.ic_battery_level),
                     "Battery Level",
-                    "${batteryData.percentage} %"
+                    "${Bviewmodel.percentageCharge.collectAsState().value} %"
                 )
                 minorDetailBatter(
                     painterResource(id = R.drawable.ic_plugged),
                     "Plugged",
-                    "${batteryData.plugged}"
+                    Bviewmodel.plugged.collectAsState().value
                 )
                 minorDetailBatter(
                     painterResource(id = R.drawable.ic_status),
                     "Status",
-                  "${batteryData.status}"
+                  "${Bviewmodel.status.collectAsState().value}"
                 )
                 minorDetailBatter(
                     painterResource(id = R.drawable.ic_voltage),
                     "Voltage",
-                  "${batteryData.batteryVoltage} V"
+                  "${Bviewmodel.batteryVoltage.collectAsState().value}V"
                 )
                 minorDetailBatter(
                     painterResource(id = R.drawable.ic_fast_charging),
                     "Fast Charging",
-                    "${batteryData.chargingSpeed}"
+                    Bviewmodel.chargingSpeed.collectAsState().value
                 )
                 minorDetailBatter(
                     painterResource(id = R.drawable.ic_temperature),
                     "Temprature",
-                    "${batteryData.batteryTemprature}"
+                    Bviewmodel.BatteryTemprature.collectAsState().value
                 )
                 minorDetailBatter(
                     painterResource(id = R.drawable.ic_capacity),
                     "Battery Capacity",
-                   "${batteryData.batteryCapacity}"
+                   "${Bviewmodel.batteryCapacity.collectAsState().value}"
                 )
                 minorDetailBatter(
                     painterResource(id = R.drawable.ic_energy),
                     "Battery Energy",
-                    "${batteryData.batteryEnergy } mWh"
+                    "${Bviewmodel.batteryEnergy.collectAsState().value}mWh"
                 )
                 minorDetailBatter(
                     painterResource(id = R.drawable.ic_current_charging),
                     "Average Current",
-                    "${batteryData.batteryAvrageCurrent} mA"
+                    "${Bviewmodel.batteryAvrageCurrent.collectAsState().value} mA"
                 )
                 minorDetailBatter(
                     painterResource(id = R.drawable.ic_charging_current),
                     "Average Power",
-                    "${batteryData.avragePower} mW"
+                    "${Bviewmodel.averagePower.collectAsState().value} mW"
                 )
 
 

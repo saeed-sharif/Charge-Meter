@@ -2,7 +2,10 @@ package com.mobivone.chargemeter.utils
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.os.BatteryManager
+import java.text.DecimalFormat
+import java.text.NumberFormat
 
 class batteryUtils {
 
@@ -22,15 +25,13 @@ class batteryUtils {
 
         fun getBatteryPluggedText(batteryPluged: Int): String {
             return when (batteryPluged) {
-                BatteryManager.BATTERY_PLUGGED_USB -> "USB"
-                BatteryManager.BATTERY_PLUGGED_AC -> "AC"
+                BatteryManager.BATTERY_PLUGGED_USB -> "USB Plug"
+                BatteryManager.BATTERY_PLUGGED_AC -> "AC Plug"
                 BatteryManager.BATTERY_PLUGGED_WIRELESS -> "Dis Charging"
                 else -> "Unknown"
 
 
             }
-
-
 
 
         }
@@ -82,6 +83,38 @@ class batteryUtils {
                 (manager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CURRENT_AVERAGE) / 1000000).toDouble()
             avgCurrent = Math.abs(avgCurrent)
             return avgCurrent
+        }
+
+        fun AveragePower(
+            mBatteryManager: BatteryManager,
+            batteryVoltage: Float,
+            batteryCapacity: Int
+        ): Int {
+
+            val result: Int = (batteryVoltage * batteryCapacity).toInt()
+            return result
+
+        }
+
+        fun getVoltage(intent: Intent): Float {
+            val format: NumberFormat = DecimalFormat("#.#")
+            val voltage: Int = intent.getIntExtra(BatteryManager.EXTRA_VOLTAGE, 0)
+            var fullVoltage = (voltage * 0.001).toFloat()
+            fullVoltage = format.format(fullVoltage.toDouble()).toFloat()
+
+            return fullVoltage
+        }
+
+        /**** Khan zaman  ****/
+        /**** Measure changable values ****/
+
+        fun spotCurrent(manager: BatteryManager): Double {
+
+            val spotcurrent =
+                manager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CURRENT_NOW) / (1000.0 * 1000.0)
+            val k = Math.abs(spotcurrent)
+            return k
+
         }
 
     }
