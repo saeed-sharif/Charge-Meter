@@ -22,7 +22,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
@@ -35,12 +34,8 @@ import com.mobivone.chargemeter.BatteryViewModel
 import com.mobivone.chargemeter.R
 
 @Composable
-fun Detail() {
+fun Detail(Bviewmodel: BatteryViewModel) {
     val model= Build.MODEL
-    val context= LocalContext.current
-    val Bviewmodel= BatteryViewModel.getInstance(context)
-
-
     Column(
         Modifier
             .fillMaxSize()

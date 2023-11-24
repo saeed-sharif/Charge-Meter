@@ -15,6 +15,7 @@ import com.mobivone.chargemeter.uiScreen.BodyContent
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val BatteryViewModelInstance=BatteryViewModel.getInstance(this)
         setContent {
             val navController:NavHostController= rememberNavController()
             ChargeMeterTheme {
@@ -24,7 +25,7 @@ class MainActivity : ComponentActivity() {
                     color = colorResource(id = R.color.app_background)
                 ) {
                     navigationDrawer(navController =navController)
-                    BodyContent(navController = navController)
+                    BodyContent(navController = navController,BatteryViewModelInstance)
 
                 }
             }

@@ -1,6 +1,7 @@
 package com.mobivone.chargemeter.uiScreen
 
 import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -38,6 +39,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
 import com.mobivone.chargemeter.BatteryViewModel
 import com.mobivone.chargemeter.R
 import java.text.DecimalFormat
@@ -46,24 +48,19 @@ import java.text.NumberFormat
 
 /** FOR VERTICLE DIVIDER WE NEED MUST SPECIFC HEIGHT FOR CONTAINER (roW,COLOUMN,CARD,BOX,ETC) ***/
 @Composable
-fun Measure() {
+fun Measure(BatteryViewModel: BatteryViewModel) {
     var MeasureFormat: NumberFormat = DecimalFormat("0.00")
     val context = LocalContext.current
-
-
-    val BatteryViewModel = BatteryViewModel.getInstance(context)
-    val plugedd= BatteryViewModel.plugged.collectAsState().value
-    var visibility by remember{ mutableStateOf(false)}
-     if (plugedd=="Unknown"){
-         visibility=false
-     }
-    else{
-        visibility=true
+    val plugedd = BatteryViewModel.plugged.collectAsState().value
+    var visibility by remember { mutableStateOf(false) }
+    if (plugedd == "Un Plugged") {
+        visibility = false
+    } else {
+        visibility = true
     }
-
-
     Log.d("WHY VALUE", BatteryViewModel.spotCurrent.collectAsState().value)
-    val betteryIcon = getPercentageIcon(percentageIconValue =  BatteryViewModel.percentageCharge.collectAsState().value)
+    val betteryIcon =
+        getPercentageIcon(percentageIconValue = BatteryViewModel.percentageCharge.collectAsState().value)
 
 
     //  Toast.makeText(context, "$percentage", Toast.LENGTH_SHORT).show()
@@ -71,33 +68,33 @@ fun Measure() {
         Modifier
             .fillMaxSize()
     ) {
-        if(visibility){
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_energy),
-                contentDescription = "",
-                tint = colorResource(
-                    id = R.color.sky_color
+        if (visibility) {
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_energy),
+                    contentDescription = "",
+                    tint = colorResource(
+                        id = R.color.sky_color
+                    )
                 )
-            )
-            Spacer(modifier = Modifier.width(9.dp))
-            Text(
-                text = "NORMAL ",
-                fontSize = 16.sp,
-                color = colorResource(id = R.color.sky_color)
-            )
-            Text(
-                text = "${BatteryViewModel.plugged.collectAsState().value}",
-                fontSize = 16.sp,
-                color = colorResource(id = R.color.sky_color)
-            )
-        }
+                Spacer(modifier = Modifier.width(9.dp))
+                Text(
+                    text = "NORMAL ",
+                    fontSize = 16.sp,
+                    color = colorResource(id = R.color.sky_color)
+                )
+                Text(
+                    text = "${BatteryViewModel.plugged.collectAsState().value}",
+                    fontSize = 16.sp,
+                    color = colorResource(id = R.color.sky_color)
+                )
+            }
         }
         Row(
             Modifier
@@ -137,14 +134,18 @@ fun Measure() {
                         )
                     }
 
-
-                    Icon(
-                        painter = betteryIcon,
-                        contentDescription = "",
-                        modifier = Modifier
+                    Image(
+                        painter = betteryIcon, contentDescription = "", modifier = Modifier
                             .height(70.dp)
                             .width(160.dp)
                     )
+                    /*  Icon(
+                          painter = betteryIcon,
+                          contentDescription = "",
+                          modifier = Modifier
+                              .height(70.dp)
+                              .width(160.dp)
+                      )*/
                 }
                 Spacer(modifier = Modifier.height(10.dp))
                 Row(
@@ -279,7 +280,7 @@ fun Measure() {
                     )
 
                     DegitalValueBox(
-                        largetext = "${BatteryViewModel.spotCurrent.collectAsState().value}",
+                        largetext = BatteryViewModel.spotCurrent.collectAsState().value,
                         largecolor = colorResource(id = R.color.current_color),
                         smallcolor = colorResource(id = R.color.white_text_color),
                         smallvalue = "A",
@@ -378,159 +379,168 @@ fun Measure() {
 
             }
         }
-        /*** LAST ROW ***/
         Spacer(modifier = Modifier.height(10.dp))
-        Row(
+        /*** LAST ROW ***/
+        Column(
             Modifier
                 .fillMaxWidth()
-                .height(50.dp)
                 .background(color = colorResource(id = R.color.light_black))
         ) {
 
-            Column(
+            Row(
                 Modifier
                     .fillMaxWidth()
-                    .weight(1f),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(2.dp)
-            ) {
-                Text(
-                    text = "Max",
-                    color = colorResource(id = R.color.white_text_color),
-                    fontSize = 13.sp
-                )
-                DegitalValueBox(
-                    largetext = "${BatteryViewModel.maximumCurrent.collectAsState().value}",
-                    largecolor = colorResource(id = R.color.sky_color),
-                    smallcolor = colorResource(id = R.color.white_text_color),
-                    smallvalue = "A",
-                    fontsize = 20.sp,
-                    topPadding = 2.dp,
-                    endPadding = 32.dp,
-                    fontWeight = FontWeight.W600
-                )
+                    .background(color = colorResource(id = R.color.light_black))
+                    .height(50.dp)
 
+            ) {
+
+                Column(
+                    Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                ) {
+                    Text(
+                        text = "Max",
+                        color = colorResource(id = R.color.white_text_color),
+                        fontSize = 13.sp
+                    )
+                    DegitalValueBox(
+                        largetext = "${BatteryViewModel.maximumCurrent.collectAsState().value}",
+                        largecolor = colorResource(id = R.color.sky_color),
+                        smallcolor = colorResource(id = R.color.white_text_color),
+                        smallvalue = "A",
+                        fontsize = 20.sp,
+                        topPadding = 2.dp,
+                        endPadding = 32.dp,
+                        fontWeight = FontWeight.W600
+                    )
+
+                }
+                VerticalDivider(thickness = 1.dp, modifier = Modifier.padding(top = 10.dp))
+                Column(
+                    Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                ) {
+                    Text(
+                        text = "MIN",
+                        color = colorResource(id = R.color.white_text_color),
+                        fontSize = 13.sp
+                    )
+                    DegitalValueBox(
+                        largetext = "${BatteryViewModel.minimumCurrent.collectAsState().value}",
+                        largecolor = colorResource(id = R.color.sky_color),
+                        smallcolor = colorResource(id = R.color.white_text_color),
+                        smallvalue = "A",
+                        fontsize = 20.sp,
+                        topPadding = 2.dp,
+                        endPadding = 32.dp,
+                        fontWeight = FontWeight.W600
+                    )
+
+                }
+                VerticalDivider(thickness = 1.dp, modifier = Modifier.padding(top = 10.dp))
+                Column(
+                    Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                ) {
+                    Text(
+                        text = "AVG",
+                        color = colorResource(id = R.color.white_text_color),
+                        fontSize = 13.sp
+                    )
+                    DegitalValueBox(
+                        largetext = "${BatteryViewModel.MeasureAvrageCurrent.collectAsState().value}",
+                        largecolor = colorResource(id = R.color.sky_color),
+                        smallcolor = colorResource(id = R.color.white_text_color),
+                        smallvalue = "A",
+                        fontsize = 20.sp,
+                        topPadding = 2.dp,
+                        endPadding = 32.dp,
+                        fontWeight = FontWeight.W600
+                    )
+
+
+                }
             }
-            VerticalDivider(thickness = 1.dp, modifier = Modifier.padding(top = 10.dp))
-            Column(
+            HorizontalDivider(
+                thickness = 1.dp,
+                modifier = Modifier.padding(start = 8.dp, end = 8.dp)
+            )
+            /**3rd row complet **/
+            /**3rd row complet **/
+            Row(
                 Modifier
                     .fillMaxWidth()
-                    .weight(1f),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(2.dp)
+                    .height(35.dp)
+                    .background(color = colorResource(id = R.color.light_black))
             ) {
-                Text(
-                    text = "MIN",
-                    color = colorResource(id = R.color.white_text_color),
-                    fontSize = 13.sp
-                )
-                DegitalValueBox(
-                    largetext = "${BatteryViewModel.minimumCurrent.collectAsState().value}",
-                    largecolor = colorResource(id = R.color.sky_color),
-                    smallcolor = colorResource(id = R.color.white_text_color),
-                    smallvalue = "A",
-                    fontsize = 20.sp,
-                    topPadding = 2.dp,
-                    endPadding = 32.dp,
-                    fontWeight = FontWeight.W600
-                )
+                Column(
+                    Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .padding(3.dp), horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    DegitalValueBox(
+                        largetext = "${BatteryViewModel.maximumWatt.collectAsState().value}",
+                        largecolor = colorResource(id = R.color.sky_color),
+                        smallcolor = colorResource(id = R.color.white_text_color),
+                        smallvalue = "W",
+                        fontsize = 20.sp,
+                        topPadding = 2.dp,
+                        endPadding = 26.dp,
+                        fontWeight = FontWeight.W600
+                    )
+
+                }
+                VerticalDivider(thickness = 1.dp, modifier = Modifier.padding(bottom = 8.dp))
+                Column(
+                    Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .padding(3.dp), horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    DegitalValueBox(
+                        largetext = "${BatteryViewModel.minimumWatt.collectAsState().value}",
+                        largecolor = colorResource(id = R.color.sky_color),
+                        smallcolor = colorResource(id = R.color.white_text_color),
+                        smallvalue = "W",
+                        fontsize = 20.sp,
+                        topPadding = 2.dp,
+                        endPadding = 26.dp,
+                        fontWeight = FontWeight.W600
+                    )
+                }
+                VerticalDivider(thickness = 1.dp, modifier = Modifier.padding(bottom = 8.dp))
+                Column(
+                    Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .padding(3.dp), horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    DegitalValueBox(
+                        largetext = "${BatteryViewModel.MeasureaverageWatt.collectAsState().value}",
+                        largecolor = colorResource(id = R.color.sky_color),
+                        smallcolor = colorResource(id = R.color.white_text_color),
+                        smallvalue = "W",
+                        fontsize = 20.sp,
+                        topPadding = 2.dp,
+                        endPadding = 26.dp,
+                        fontWeight = FontWeight.W600
+                    )
+
+                }
+
 
             }
-            VerticalDivider(thickness = 1.dp, modifier = Modifier.padding(top = 10.dp))
-            Column(
-                Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(2.dp)
-            ) {
-                Text(
-                    text = "AVG",
-                    color = colorResource(id = R.color.white_text_color),
-                    fontSize = 13.sp
-                )
-                DegitalValueBox(
-                    largetext = "${BatteryViewModel.MeasureAvrageCurrent.collectAsState().value}",
-                    largecolor = colorResource(id = R.color.sky_color),
-                    smallcolor = colorResource(id = R.color.white_text_color),
-                    smallvalue = "A",
-                    fontsize = 20.sp,
-                    topPadding = 2.dp,
-                    endPadding = 32.dp,
-                    fontWeight = FontWeight.W600
-                )
-
-
-            }
-        }
-        HorizontalDivider(
-            thickness = 1.dp,
-            modifier = Modifier.padding(start = 8.dp, end = 8.dp)
-        )
-        /**3rd row complet **/
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .height(35.dp)
-                .background(color = colorResource(id = R.color.light_black))
-        ) {
-            Column(
-                Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .padding(3.dp), horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                DegitalValueBox(
-                    largetext = "${BatteryViewModel.maximumWatt.collectAsState().value}",
-                    largecolor = colorResource(id = R.color.sky_color),
-                    smallcolor = colorResource(id = R.color.white_text_color),
-                    smallvalue = "W",
-                    fontsize = 20.sp,
-                    topPadding = 2.dp,
-                    endPadding = 26.dp,
-                    fontWeight = FontWeight.W600
-                )
-
-            }
-            VerticalDivider(thickness = 1.dp, modifier = Modifier.padding(bottom = 8.dp))
-            Column(
-                Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .padding(3.dp), horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                DegitalValueBox(
-                    largetext = "${BatteryViewModel.minimumWatt.collectAsState().value}",
-                    largecolor = colorResource(id = R.color.sky_color),
-                    smallcolor = colorResource(id = R.color.white_text_color),
-                    smallvalue = "W",
-                    fontsize = 20.sp,
-                    topPadding = 2.dp,
-                    endPadding = 26.dp,
-                    fontWeight = FontWeight.W600
-                )
-            }
-            VerticalDivider(thickness = 1.dp, modifier = Modifier.padding(bottom = 8.dp))
-            Column(
-                Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .padding(3.dp), horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                DegitalValueBox(
-                    largetext = "${BatteryViewModel.MeasureaverageWatt.collectAsState().value}",
-                    largecolor = colorResource(id = R.color.sky_color),
-                    smallcolor = colorResource(id = R.color.white_text_color),
-                    smallvalue = "W",
-                    fontsize = 20.sp,
-                    topPadding = 2.dp,
-                    endPadding = 26.dp,
-                    fontWeight = FontWeight.W600
-                )
-
-            }
-
-
         }
 
     }
@@ -548,26 +558,54 @@ fun DegitalValueBox(
     endPadding: Dp,
     fontWeight: FontWeight
 ) {
-    Box(
-        modifier = Modifier.fillMaxWidth(),
-        contentAlignment = Alignment.Center
-    ) {
+
+    ConstraintLayout() {
+        val (largeText, SmallText) = createRefs()
+
         Text(
             text = "$largetext",
             fontFamily = FontFamily(Font(R.font.digital7mono_b1g5)),
             color = largecolor,
             fontSize = fontsize,
-            fontWeight = fontWeight
+            fontWeight = fontWeight,
+            modifier = Modifier.constrainAs(largeText) {
+                top.linkTo(parent.top)
+                start.linkTo(parent.start)
+            }
         )
         Text(
             text = "$smallvalue",
             color = smallcolor,
             fontSize = 13.sp,
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(top = topPadding, end = endPadding)
+            modifier = Modifier.constrainAs(SmallText) {
+                top.linkTo(parent.top, margin = 10.dp)
+                start.linkTo(largeText.end, margin = 5.dp)
+                bottom.linkTo(parent.bottom)
+            }
         )
+
+
     }
+    /*  Box(
+          modifier = Modifier.fillMaxWidth(),
+          contentAlignment = Alignment.Center
+      ) {
+          Text(
+              text = "$largetext",
+              fontFamily = FontFamily(Font(R.font.digital7mono_b1g5)),
+              color = largecolor,
+              fontSize = fontsize,
+              fontWeight = fontWeight
+          )
+          Text(
+              text = "$smallvalue",
+              color = smallcolor,
+              fontSize = 13.sp,
+              modifier = Modifier
+                  .align(Alignment.BottomStart) // Align the second text to the bottom of the first text
+                  .padding(start = 5.dp, bottom = 4.dp) // Add padding to position the second text
+          )
+      }*/
 
 }
 
@@ -584,10 +622,3 @@ fun getPercentageIcon(percentageIconValue: Int): Painter {
     return batteryIcon
     //  return  rememberVectorPainter(image = batteryIcon)
 }
-
-
-
-
-
-
-

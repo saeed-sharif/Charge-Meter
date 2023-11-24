@@ -17,6 +17,8 @@ import java.text.DecimalFormat
 import java.text.NumberFormat
 
 class BatteryViewModel(private val context: Context) : ViewModel() {
+
+    var isCurrentRunning:Boolean=true
     var format: NumberFormat = DecimalFormat("#.#")
     var MeasureFormat: NumberFormat = DecimalFormat("0.00")
     val batteryManager: BatteryManager by lazy {
@@ -36,17 +38,15 @@ class BatteryViewModel(private val context: Context) : ViewModel() {
     val averagePower = MutableStateFlow("")
     val MeasureAvrageCurrent = MutableStateFlow("0.0")
     val MeasureaverageWatt = MutableStateFlow("0.0")
-
     /*** This for Measure Activity  ***/
     val spotCurrent = MutableStateFlow("")
+    //power in watt
     val WattPower = MutableStateFlow("")
-
     /******** MIN MAX, CURRENT & WATT ***********/
     var maximumCurrent = MutableStateFlow("")
     var minimumCurrent = MutableStateFlow("")
     var maximumWatt = MutableStateFlow("")
     var minimumWatt = MutableStateFlow("")
-
     @SuppressLint("RememberReturnType")
     val broadcastReceiver: BroadcastReceiver = BatteryManagerBroadcastReceiver {
         //Detail  View related data
@@ -118,11 +118,16 @@ class BatteryViewModel(private val context: Context) : ViewModel() {
                 }
             }
         }
-        handler.post(AverageCurrentChecker)
+        if(isCurrentRunning){
+            handler.post(AverageCurrentChecker)
+        }
+        isCurrentRunning=false
+
     }
 
     /*****   LAST ROW VALUE UPDATATION MIN MAX, AVERAGE *****/
     companion object {
+        @SuppressLint("StaticFieldLeak")
         @Volatile
         private lateinit var instance: BatteryViewModel
         fun getInstance(context: Context): BatteryViewModel {

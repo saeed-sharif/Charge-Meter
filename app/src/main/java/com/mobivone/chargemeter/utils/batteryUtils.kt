@@ -28,7 +28,7 @@ class batteryUtils {
                 BatteryManager.BATTERY_PLUGGED_USB -> "USB Plug"
                 BatteryManager.BATTERY_PLUGGED_AC -> "AC Plug"
                 BatteryManager.BATTERY_PLUGGED_WIRELESS -> "Dis Charging"
-                else -> "Unknown"
+                else -> "Un Plugged"
 
 
             }

@@ -3,11 +3,16 @@ package com.mobivone.chargemeter.uiScreen
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
@@ -25,46 +30,48 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.mobivone.chargemeter.BatteryViewModel
 import com.mobivone.chargemeter.R
 import com.mobivone.chargemeter.navigationGraph.NavGraph
+
+var navigateClick = mutableStateOf(false)
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BodyContent(navController: NavHostController) {
+fun BodyContent(navController: NavHostController, BatteryViewModelInstance: BatteryViewModel) {
 
 
     var appbarTitle by remember {
         mutableStateOf("")
     }
-    var navigateClick by remember { mutableStateOf(false) }
-    val offSetAnim by animateDpAsState(targetValue = if (navigateClick) 253.dp else 0.dp)
-    val scaleAnim by animateFloatAsState(targetValue = if (navigateClick) 0.6f else 1.0f)
+    val offSetAnim by animateDpAsState(targetValue = if (navigateClick.value) 253.dp else 0.dp)
+    val scaleAnim by animateFloatAsState(targetValue = if (navigateClick.value) 0.6f else 1.0f)
     //to track which screen are now visible Right now
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
-
     LaunchedEffect(currentRoute) {
-        navigateClick = false // Reset the navigateClick state when a new route is navigated to
+        navigateClick.value = false // Reset the navigateClick state when a new route is navigated to
     }
-
     if (currentRoute == "measure") {
-        appbarTitle = "Measure"
+        appbarTitle = "MEASURE"
 
     } else if (currentRoute == "detail") {
-        appbarTitle = "Detail"
+        appbarTitle = "DETAIL"
 
     } else if (currentRoute == "about_us") {
-        appbarTitle = "About Us"
+        appbarTitle = "ABOUT US"
 
     }
     Column(
@@ -96,9 +103,9 @@ fun BodyContent(navController: NavHostController) {
                     },
                     navigationIcon = {
                         val icon =
-                            if (navigateClick) Icons.AutoMirrored.Filled.ArrowBack else Icons.Default.Menu
+                            if (navigateClick.value) Icons.AutoMirrored.Filled.ArrowBack else Icons.Default.Menu
                         IconButton(
-                            onClick = { navigateClick = !navigateClick },
+                            onClick = { navigateClick.value = !navigateClick.value },
                             colors = IconButtonDefaults.iconButtonColors(
                                 contentColor = Color.Black // Set the color of the icon to black
                             )
@@ -117,13 +124,49 @@ fun BodyContent(navController: NavHostController) {
             content = { paddingvalue ->
                 Column(Modifier.padding(paddingvalue)) {
 
-                        NavGraph(navController = navController)
-
-
-
+                    NavGraph(navController = navController, BatteryViewModelInstance)
                 }
 
             }
         )
     }
 }
+
+
+@Composable
+fun navigationDrawerItem(
+    title: String,
+    icon: Painter,
+    navController: NavHostController,
+    destination: String
+) {
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoot = navBackStackEntry?.destination?.route
+    val selected = currentRoot == destination
+
+
+
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .height(50.dp)
+            .clickable {
+                navController.navigate(destination)
+                navigateClick.value=false
+            },
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            painter = icon,
+            contentDescription = "",
+            tint = if (selected) colorResource(id = R.color.sky_color) else Color.White
+        )
+        Spacer(modifier = Modifier.width(10.dp))
+        Text(
+            text = "$title",
+            color = if (selected) colorResource(id = R.color.sky_color) else Color.White
+        )
+    }
+}
+
+
