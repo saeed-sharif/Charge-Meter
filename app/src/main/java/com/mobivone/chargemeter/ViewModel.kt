@@ -55,7 +55,7 @@ class BatteryViewModel(private val context: Context) : ViewModel() {
         batteryTechnology.value = it.getStringExtra(BatteryManager.EXTRA_TECHNOLOGY).toString()
         percentageCharge.value = it.getIntExtra(BatteryManager.EXTRA_LEVEL, 0)
         plugged.value =
-            batteryUtils.getBatteryPluggedText(it.getIntExtra(BatteryManager.EXTRA_PLUGGED, -99))
+            batteryUtils.getBatteryPluggedText(it.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0))
         status.value =
             batteryUtils.getBatteryStatusText(it.getIntExtra(BatteryManager.EXTRA_STATUS, -99))
         //Full Voltage

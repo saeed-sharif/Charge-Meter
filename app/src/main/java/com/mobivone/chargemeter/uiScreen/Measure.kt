@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -49,15 +50,15 @@ import java.text.NumberFormat
 /** FOR VERTICLE DIVIDER WE NEED MUST SPECIFC HEIGHT FOR CONTAINER (roW,COLOUMN,CARD,BOX,ETC) ***/
 @Composable
 fun Measure(BatteryViewModel: BatteryViewModel) {
-    var MeasureFormat: NumberFormat = DecimalFormat("0.00")
-    val context = LocalContext.current
     val plugedd = BatteryViewModel.plugged.collectAsState().value
     var visibility by remember { mutableStateOf(false) }
-    if (plugedd == "Un Plugged") {
-        visibility = false
+    visibility = plugedd != "Un Plugged"
+    val painter = if (plugedd == "Un Plugged") {
+        painterResource(id = R.drawable.unplugged)
     } else {
-        visibility = true
+        painterResource(id = R.drawable.plugged)
     }
+
     Log.d("WHY VALUE", BatteryViewModel.spotCurrent.collectAsState().value)
     val betteryIcon =
         getPercentageIcon(percentageIconValue = BatteryViewModel.percentageCharge.collectAsState().value)
@@ -139,13 +140,7 @@ fun Measure(BatteryViewModel: BatteryViewModel) {
                             .height(70.dp)
                             .width(160.dp)
                     )
-                    /*  Icon(
-                          painter = betteryIcon,
-                          contentDescription = "",
-                          modifier = Modifier
-                              .height(70.dp)
-                              .width(160.dp)
-                      )*/
+
                 }
                 Spacer(modifier = Modifier.height(10.dp))
                 Row(
@@ -169,12 +164,7 @@ fun Measure(BatteryViewModel: BatteryViewModel) {
                             tint = colorResource(id = R.color.light_white)
                         )
                         Spacer(modifier = Modifier.height(4.dp))
-                        /* Text(
-                         text = "0.00",
-                         fontFamily = FontFamily(Font(R.font.digital7mono_b1g5)),
-                         color = colorResource(id = R.color.sky_color),
-                         fontSize = 28.sp,)*/
-                        DegitalValueBox(
+                        DegitalLargeValueBox(
                             largetext = " ${BatteryViewModel.batteryVoltage.collectAsState().value} V",
                             largecolor = colorResource(id = R.color.sky_color),
                             smallcolor = colorResource(id = R.color.white_text_color),
@@ -187,7 +177,7 @@ fun Measure(BatteryViewModel: BatteryViewModel) {
                     }
                     VerticalDivider(
                         thickness = 1.dp,
-                        modifier = Modifier.padding(top = 2.dp, bottom = 2.dp)
+                        modifier = Modifier.padding(top = 2.dp)
                     )
                     Column(
                         Modifier
@@ -201,8 +191,8 @@ fun Measure(BatteryViewModel: BatteryViewModel) {
                             contentDescription = "",
                             tint = colorResource(id = R.color.light_white)
                         )
-                        Spacer(modifier = Modifier.height(2.dp))
-                        DegitalValueBox(
+
+                        DegitalLargeValueBox(
                             largetext = "${BatteryViewModel.BatteryTemprature.collectAsState().value}",
                             largecolor = colorResource(id = R.color.sky_color),
                             smallcolor = colorResource(id = R.color.white_text_color),
@@ -215,12 +205,97 @@ fun Measure(BatteryViewModel: BatteryViewModel) {
                     }
                     VerticalDivider(
                         thickness = 1.dp,
-                        modifier = Modifier.padding(top = 2.dp, bottom = 2.dp)
+                        modifier = Modifier.padding(top = 2.dp)
                     )
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                            .padding(top = 1.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(3.dp)
+                    ) {
+                        Image(
+                            painter = painter,
+                            contentDescription = "",
+                            modifier = Modifier.size(25.dp)
+                        )
+                        Text(
+                            text = if(plugedd=="Un Plugged") " - - -"  else plugedd,
+                            fontSize = 22.sp,
+                            fontWeight = FontWeight.W600,
+                            fontFamily = FontFamily(
+                                Font(R.font.digital7mono_b1g5)
+                            ), color = colorResource(id = R.color.sky_color)
+                        )
+                    }
+                }
+                HorizontalDivider(thickness = 1.dp)
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .height(65.dp)
+                        .background(
+                            color = colorResource(id = R.color.light_black),
+                            shape = RoundedCornerShape(5.dp)
+                        )
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                            .padding(top = 7.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(3.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_battery_health),
+                            contentDescription = "",
+                            tint = colorResource(
+                                id = R.color.light_white
+                            )
+                        )
+                        Text(
+                            text = " ${BatteryViewModel.health.collectAsState().value}",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.W600,
+                            fontFamily = FontFamily(
+                                Font(R.font.digital7mono_b1g5)
+                            ),
+                            color = colorResource(id = R.color.current_color)
+                        )
+                    }
+                    VerticalDivider(thickness = 1.dp)
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                            .padding(top = 7.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(3.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_battery_type),
+                            contentDescription = "",
+                            tint = colorResource(
+                                id = R.color.light_white
+                            )
+                        )
+                        Text(
+                            text = BatteryViewModel.batteryTechnology.collectAsState().value,
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.W600,
+                            fontFamily = FontFamily(
+                                Font(R.font.digital7mono_b1g5)
+                            ), color = colorResource(id = R.color.sky_color)
+                        )
+                    }
+
+                    VerticalDivider(thickness = 1.dp)
                     Column(
                         Modifier
                             .fillMaxWidth()
-                            .weight(1f),
+                            .weight(1f).padding(top=5.dp),
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
@@ -237,7 +312,7 @@ fun Measure(BatteryViewModel: BatteryViewModel) {
                             horizontalArrangement = Arrangement.Center,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            DegitalValueBox(
+                            DegitalLargeValueBox(
                                 largetext = "${BatteryViewModel.batteryCapacity.collectAsState().value}",
                                 largecolor = colorResource(id = R.color.current_color),
                                 smallcolor = colorResource(id = R.color.white_text_color),
@@ -249,8 +324,11 @@ fun Measure(BatteryViewModel: BatteryViewModel) {
                             )
                         }
                     }
+
+
                 }
             }
+
         }
         //3Rd Card
         Column(
@@ -279,7 +357,7 @@ fun Measure(BatteryViewModel: BatteryViewModel) {
                         color = colorResource(id = R.color.white_text_color)
                     )
 
-                    DegitalValueBox(
+                    DegitalLargeValueBox(
                         largetext = BatteryViewModel.spotCurrent.collectAsState().value,
                         largecolor = colorResource(id = R.color.current_color),
                         smallcolor = colorResource(id = R.color.white_text_color),
@@ -309,7 +387,7 @@ fun Measure(BatteryViewModel: BatteryViewModel) {
                         fontSize = 13.sp,
                         color = colorResource(id = R.color.white_text_color)
                     )
-                    DegitalValueBox(
+                    DegitalLargeValueBox(
                         largetext = "${BatteryViewModel.WattPower.collectAsState().value}",
                         largecolor = colorResource(id = R.color.sky_color),
                         smallcolor = colorResource(id = R.color.white_text_color),
@@ -343,7 +421,7 @@ fun Measure(BatteryViewModel: BatteryViewModel) {
                     verticalArrangement = Arrangement.Center
                 ) {
 
-                    DegitalValueBox(
+                    DegitalSmallValueBox(
                         largetext = "0.00",
                         largecolor = colorResource(id = R.color.current_color),
                         smallcolor = colorResource(id = R.color.white_text_color),
@@ -365,7 +443,7 @@ fun Measure(BatteryViewModel: BatteryViewModel) {
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center,
                 ) {
-                    DegitalValueBox(
+                    DegitalSmallValueBox(
                         largetext = "0.00",
                         largecolor = colorResource(id = R.color.sky_color),
                         smallcolor = colorResource(id = R.color.white_text_color),
@@ -407,7 +485,7 @@ fun Measure(BatteryViewModel: BatteryViewModel) {
                         color = colorResource(id = R.color.white_text_color),
                         fontSize = 13.sp
                     )
-                    DegitalValueBox(
+                    DegitalSmallValueBox(
                         largetext = "${BatteryViewModel.maximumCurrent.collectAsState().value}",
                         largecolor = colorResource(id = R.color.sky_color),
                         smallcolor = colorResource(id = R.color.white_text_color),
@@ -432,7 +510,7 @@ fun Measure(BatteryViewModel: BatteryViewModel) {
                         color = colorResource(id = R.color.white_text_color),
                         fontSize = 13.sp
                     )
-                    DegitalValueBox(
+                    DegitalSmallValueBox(
                         largetext = "${BatteryViewModel.minimumCurrent.collectAsState().value}",
                         largecolor = colorResource(id = R.color.sky_color),
                         smallcolor = colorResource(id = R.color.white_text_color),
@@ -442,32 +520,6 @@ fun Measure(BatteryViewModel: BatteryViewModel) {
                         endPadding = 32.dp,
                         fontWeight = FontWeight.W600
                     )
-
-                }
-                VerticalDivider(thickness = 1.dp, modifier = Modifier.padding(top = 10.dp))
-                Column(
-                    Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(2.dp)
-                ) {
-                    Text(
-                        text = "AVG",
-                        color = colorResource(id = R.color.white_text_color),
-                        fontSize = 13.sp
-                    )
-                    DegitalValueBox(
-                        largetext = "${BatteryViewModel.MeasureAvrageCurrent.collectAsState().value}",
-                        largecolor = colorResource(id = R.color.sky_color),
-                        smallcolor = colorResource(id = R.color.white_text_color),
-                        smallvalue = "A",
-                        fontsize = 20.sp,
-                        topPadding = 2.dp,
-                        endPadding = 32.dp,
-                        fontWeight = FontWeight.W600
-                    )
-
 
                 }
             }
@@ -489,7 +541,7 @@ fun Measure(BatteryViewModel: BatteryViewModel) {
                         .weight(1f)
                         .padding(3.dp), horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    DegitalValueBox(
+                    DegitalSmallValueBox(
                         largetext = "${BatteryViewModel.maximumWatt.collectAsState().value}",
                         largecolor = colorResource(id = R.color.sky_color),
                         smallcolor = colorResource(id = R.color.white_text_color),
@@ -508,7 +560,7 @@ fun Measure(BatteryViewModel: BatteryViewModel) {
                         .weight(1f)
                         .padding(3.dp), horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    DegitalValueBox(
+                    DegitalSmallValueBox(
                         largetext = "${BatteryViewModel.minimumWatt.collectAsState().value}",
                         largecolor = colorResource(id = R.color.sky_color),
                         smallcolor = colorResource(id = R.color.white_text_color),
@@ -518,25 +570,6 @@ fun Measure(BatteryViewModel: BatteryViewModel) {
                         endPadding = 26.dp,
                         fontWeight = FontWeight.W600
                     )
-                }
-                VerticalDivider(thickness = 1.dp, modifier = Modifier.padding(bottom = 8.dp))
-                Column(
-                    Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
-                        .padding(3.dp), horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    DegitalValueBox(
-                        largetext = "${BatteryViewModel.MeasureaverageWatt.collectAsState().value}",
-                        largecolor = colorResource(id = R.color.sky_color),
-                        smallcolor = colorResource(id = R.color.white_text_color),
-                        smallvalue = "W",
-                        fontsize = 20.sp,
-                        topPadding = 2.dp,
-                        endPadding = 26.dp,
-                        fontWeight = FontWeight.W600
-                    )
-
                 }
 
 
@@ -548,7 +581,7 @@ fun Measure(BatteryViewModel: BatteryViewModel) {
 }
 
 @Composable
-fun DegitalValueBox(
+fun DegitalLargeValueBox(
     largetext: String,
     largecolor: Color,
     smallcolor: Color,
@@ -607,6 +640,47 @@ fun DegitalValueBox(
           )
       }*/
 
+}
+
+
+@Composable
+fun DegitalSmallValueBox(
+    largetext: String,
+    largecolor: Color,
+    smallcolor: Color,
+    smallvalue: String,
+    fontsize: TextUnit,
+    topPadding: Dp,
+    endPadding: Dp,
+    fontWeight: FontWeight
+) {
+    ConstraintLayout() {
+        val (largeText, SmallText) = createRefs()
+
+        Text(
+            text = "$largetext",
+            fontFamily = FontFamily(Font(R.font.digital7mono_b1g5)),
+            color = largecolor,
+            fontSize = fontsize,
+            fontWeight = fontWeight,
+            modifier = Modifier.constrainAs(largeText) {
+                top.linkTo(parent.top)
+                start.linkTo(parent.start)
+            }
+        )
+        Text(
+            text = "$smallvalue",
+            color = smallcolor,
+            fontSize = 13.sp,
+            modifier = Modifier.constrainAs(SmallText) {
+                top.linkTo(parent.top, margin = 4.dp)
+                start.linkTo(largeText.end, margin = 5.dp)
+                bottom.linkTo(parent.bottom)
+            }
+        )
+
+
+    }
 }
 
 

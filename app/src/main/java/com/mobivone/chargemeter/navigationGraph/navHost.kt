@@ -1,5 +1,6 @@
 package com.mobivone.chargemeter.navigationGraph
 
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -10,7 +11,7 @@ import com.mobivone.chargemeter.uiScreen.Detail
 import com.mobivone.chargemeter.uiScreen.Measure
 
 @Composable
-fun NavGraph(navController: NavHostController, BatteryViewModelInstance: BatteryViewModel, ) {
+fun NavGraph(navController: NavHostController, BatteryViewModelInstance: BatteryViewModel) {
 
     NavHost(navController = navController, startDestination = "measure") {
         composable("measure") {
@@ -22,6 +23,10 @@ fun NavGraph(navController: NavHostController, BatteryViewModelInstance: Battery
         composable("about_us") {
 
             AboutUs()
+        }
+        composable("exit") {
+            Text(text = "Exit")
+
         }
 
 
